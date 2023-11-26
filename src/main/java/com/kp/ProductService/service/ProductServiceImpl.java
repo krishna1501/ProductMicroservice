@@ -16,6 +16,7 @@ import static org.springframework.beans.BeanUtils.copyProperties;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
+
     @Override
     public long addProduct(ProductRequest productRequest) {
         log.info("Adding Product..");
@@ -35,10 +36,32 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getProductById(long productId) {
         Product product = productRepository
                 .findById(productId)
-                .orElseThrow(()-> new ProductServiceCustomException("Product with given id not found","PRODUCT_NOT_FOUND"));
+                .orElseThrow(() -> new ProductServiceCustomException(
+                        "Product with given id not found",
+                        "PRODUCT_NOT_FOUND"
+                ));
         ProductResponse productResponse = new ProductResponse();
-        copyProperties(product,productResponse);
+        copyProperties(product, productResponse);
 
         return productResponse;
+    }
+
+    @Override
+    public void reduceQuantity(long productId, long quantity) {
+        Product product = productRepository
+                .findById(productId)
+                .orElseThrow(() -> new ProductServiceCustomException(
+                        "Products with product this id are not found",
+                        "NOT_FOUND"
+                ));
+        if (product.getQuantity() < quantity) {
+            throw new ProductServiceCustomException(
+                    "Product does not have sufficient quantity",
+                    "INSUFFICIENT_QUANTITY"
+            );
+        }
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
+        log.info("Product quantity updated successfully");
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ProductServiceCustomException.class)
     public ResponseEntity<ErrorResponse> handleProductServiceCustomException(ProductServiceCustomException exception){
-        new ErrorResponse();
         return new ResponseEntity<>(ErrorResponse.builder()
                 .errorCode(exception.getErrorCode())
                 .errorMessage(exception.getMessage())
